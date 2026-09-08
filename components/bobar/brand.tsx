@@ -1,4 +1,4 @@
-import type { SVGProps } from "react";
+import type { MouseEventHandler, SVGProps } from "react";
 
 /** BOBAR's b monogram with two teeth cut out of the bowl. */
 export function BrandMark({ movingTeeth = false, eyes = false, ...props }: SVGProps<SVGSVGElement> & { movingTeeth?: boolean; eyes?: boolean }) {
@@ -44,9 +44,9 @@ export function BrandMark({ movingTeeth = false, eyes = false, ...props }: SVGPr
   );
 }
 
-export function Brand() {
+export function Brand({ onClick }: { onClick?: MouseEventHandler<HTMLAnchorElement> } = {}) {
   return (
-    <a className="brand" href="#top" aria-label="BOBAR – на главную">
+    <a className="brand" href="#top" aria-label="BOBAR – на главную" onClick={onClick}>
       <BrandMark />
       <span>BOBAR</span>
     </a>

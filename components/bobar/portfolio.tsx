@@ -11,7 +11,7 @@ export function Portfolio({ projects }: { projects: Project[] }) {
     loop: false,
     align: "start",
     containScroll: "trimSnaps",
-    duration: 28,
+    duration: 22,
   });
   const [selected, setSelected] = useState(0);
   const [reducedMotion, setReducedMotion] = useState(false);
@@ -32,6 +32,35 @@ export function Portfolio({ projects }: { projects: Project[] }) {
     return () => {
       api.off("select", update);
       api.off("reInit", update);
+    };
+  }, [api]);
+  useEffect(() => {
+    if (!api) return;
+    let nearby = false;
+    const prepared = new WeakSet<HTMLImageElement>();
+    const prepareImages = () => {
+      if (!nearby) return;
+      const current = api.selectedScrollSnap();
+      api.slideNodes().slice(Math.max(0, current - 1), current + 2).forEach((slide) => {
+        const image = slide.querySelector("img");
+        if (!image || prepared.has(image)) return;
+        prepared.add(image);
+        image.loading = "eager";
+        // Decode adjacent screenshots before a swipe, not during its first frame.
+        void image.decode().catch(() => prepared.delete(image));
+      });
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      nearby = entry.isIntersecting;
+      prepareImages();
+    }, { rootMargin: "400px 0px" });
+    observer.observe(api.rootNode());
+    api.on("select", prepareImages);
+    api.on("reInit", prepareImages);
+    return () => {
+      observer.disconnect();
+      api.off("select", prepareImages);
+      api.off("reInit", prepareImages);
     };
   }, [api]);
   const move = useCallback(

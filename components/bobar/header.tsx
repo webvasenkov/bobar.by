@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Menu, X } from "lucide-react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
+import { X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -19,6 +19,45 @@ const links = [
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const destination = useRef<string | null>(null);
+  const trigger = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const desktop = window.matchMedia("(min-width: 768px)");
+    const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener("change", closeOnDesktop);
+    return () => desktop.removeEventListener("change", closeOnDesktop);
+  }, []);
+
+  function navigate(event: MouseEvent<HTMLAnchorElement>, href: string) {
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+    if (!document.getElementById(href.slice(1))) return;
+    event.preventDefault();
+    destination.current = href;
+    setOpen(false);
+  }
+
+  function finishClosing(event: Event) {
+    // Radix otherwise focuses the header trigger after the anchor has scrolled.
+    // Wait for the panel to unmount and its scroll lock to release before moving.
+    event.preventDefault();
+    const href = destination.current;
+    destination.current = null;
+    const section = href && document.getElementById(href.slice(1));
+    if (!section) {
+      trigger.current?.focus({ preventScroll: true });
+      return;
+    }
+    const heading = section.querySelector<HTMLElement>("h1, h2") ?? section;
+    heading.tabIndex = -1;
+    heading.focus({ preventScroll: true });
+    if (window.location.hash !== href) window.history.pushState(null, "", href);
+    section.scrollIntoView({
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+      block: "start",
+    });
+  }
+
   return (
     <header className="site-header container">
       <Brand />
@@ -34,24 +73,27 @@ export function Header() {
       </a>
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetTrigger asChild>
-          <button className="mobile-menu" aria-label="Открыть меню">
-            Меню <Menu size={20} />
+          <button ref={trigger} className="mobile-menu" aria-label="Открыть меню">
+            <span className="menu-toggle-icon" aria-hidden="true"><span /><span /></span>
           </button>
         </SheetTrigger>
         <SheetContent
-          side="right"
+          side="top"
           className="mobile-panel"
           showCloseButton={false}
           aria-describedby={undefined}
+          onCloseAutoFocus={finishClosing}
         >
           <SheetTitle className="sr-only">Навигация BOBAR</SheetTitle>
-          <SheetClose className="menu-close" aria-label="Закрыть меню">
-            <X />
-          </SheetClose>
-          <Brand />
+          <div className="mobile-panel-header">
+            <Brand onClick={(event) => navigate(event, "#top")} />
+            <SheetClose className="menu-close" aria-label="Закрыть меню">
+              <X size={25} strokeWidth={1.5} />
+            </SheetClose>
+          </div>
           <nav aria-label="Мобильная навигация">
             {[...links, ["#contact", "Обсудить проект"]].map(([href, text]) => (
-              <a key={href} href={href} onClick={() => setOpen(false)}>
+              <a key={href} href={href} onClick={(event) => navigate(event, href)}>
                 {text}
               </a>
             ))}

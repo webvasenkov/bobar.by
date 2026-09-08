@@ -3,6 +3,7 @@ import { Header } from "@/components/bobar/header";
 import { Brand } from "@/components/bobar/brand";
 import { HeroMark, RevealEffects } from "@/components/bobar/motion";
 import { Portfolio } from "@/components/bobar/portfolio";
+import { HeroSlogans } from "@/components/bobar/hero-slogans";
 import { Faq } from "@/components/bobar/faq";
 import { ContactForm } from "@/components/bobar/contact-form";
 import { steps } from "@/lib/content";
@@ -32,10 +33,7 @@ export default async function Home() {
               <br />
               для бизнеса.
             </h1>
-            <p className="subtitle">
-              Дизайн и разработка напрямую с разработчиком.
-              <br className="desktop-break" /> Без студийной наценки.
-            </p>
+            <HeroSlogans />
             <div className="hero-actions">
               <a className="button" href="#contact">
                 Обсудить проект <ArrowRight size={22} />
