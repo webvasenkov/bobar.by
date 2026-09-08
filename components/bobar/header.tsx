@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type MouseEvent } from "react";
-import { X } from "lucide-react";
+import { ArrowUpRight, X } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -95,6 +95,7 @@ export function Header() {
             {[...links, ["#contact", "Обсудить проект"]].map(([href, text]) => (
               <a key={href} href={href} onClick={(event) => navigate(event, href)}>
                 {text}
+                {href === "#contact" && <ArrowUpRight size={23} aria-hidden="true" />}
               </a>
             ))}
           </nav>

@@ -15,6 +15,13 @@
       "when": 1788901022694,
       "tag": "0001_cynical_black_cat",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "6",
+      "when": 1788911410263,
+      "tag": "0002_big_adam_destine",
+      "breakpoints": true
     }
   ]
 }

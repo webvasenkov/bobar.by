@@ -21,6 +21,10 @@
 .admin-project { display: flex; align-items: center; gap: 24px; padding: 24px 0; border-bottom: 1px solid #deddd9; }
 .admin-thumb { width: 180px; height: 112px; border-radius: 10px; overflow: hidden; padding: 0; border: 0; background: #efeeeb; flex: none; }
 .admin-thumb img { width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.admin-thumb { border: 1px solid #aaa9a3; }
+.admin-screenshot-list { display: grid; gap: 12px; }
+.admin-screenshot-list figure { min-width: 0; }
+.admin-screenshot-list .admin-preview { border: 1px solid #aaa9a3; background: #fff; }
 .admin-project-info { flex: 1; min-width: 0; overflow-wrap: anywhere; }
 .admin-project-info p { font-size: 14px; color: var(--muted); margin-top: 8px; }
 .admin-project-actions { display: flex; gap: 8px; align-items: center; }

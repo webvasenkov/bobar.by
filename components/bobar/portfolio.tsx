@@ -5,6 +5,7 @@ import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
 import type { Project } from "@/lib/project-types";
 import { BrandMark } from "./brand";
+import { ProjectGallery } from "./project-gallery";
 
 export function Portfolio({ projects }: { projects: Project[] }) {
   const [viewportRef, api] = useEmblaCarousel({
@@ -99,18 +100,7 @@ export function Portfolio({ projects }: { projects: Project[] }) {
               aria-hidden={selected !== index}
               inert={selected !== index}
             >
-              <div className="project-preview">
-                <picture>
-                  {project.mobileImage && <source media="(max-width: 767px)" srcSet={project.mobileImage} />}
-                <img
-                  src={project.desktopImage}
-                  alt={`Главная страница сайта «${project.name}»`}
-                  draggable={false}
-                  loading="lazy"
-                  decoding="async"
-                />
-                </picture>
-              </div>
+              <ProjectGallery project={project} active={selected === index} />
               <div className="project-caption">
                 <div>
                   <h3>{project.name}</h3>

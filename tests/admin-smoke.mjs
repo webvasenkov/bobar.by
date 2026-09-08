@@ -78,7 +78,7 @@ try {
   assert.equal((await upload(Buffer.alloc(8 * 1024 * 1024 + 1))).status, 413);
   const bytes = await readFile("public/projects/flowers.png");
   const screens = [];
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 4; i++) {
     const response = await upload(bytes); assert.equal(response.status, 201); screens.push((await response.json()).path);
   }
   assert.equal((await fetch(base + screens[0])).status, 404, "Unpublished uploads stay private");
@@ -94,10 +94,22 @@ try {
   assert.equal(project.position, 3, "Server assigns the next position");
   assert.equal((await publish(project)).status, 400, "Both screenshots required before publication");
   assert.equal((await (await request("/api/projects")).json()).length, 3);
-  assert.equal((await request("/api/admin/projects", "PUT", { ...project, mobileImage: screens[1], published: true })).status, 200);
+  assert.equal((await request("/api/admin/projects", "PUT", { ...project, mobileImage: screens[1], desktopImages: [screens[0], screens[2]], mobileImages: [screens[1], screens[3]], published: true })).status, 200);
   assert.equal((await request("/api/admin/projects", "PUT", project)).status, 409, "Stale edits cannot overwrite newer data");
   projects = await list(); project = projects.find(item => item.id === project.id);
   assert.equal((await (await request("/api/projects")).json()).length, 4);
+  assert.deepEqual(project.desktopImages, [screens[0], screens[2]]);
+  assert.deepEqual(project.mobileImages, [screens[1], screens[3]]);
+  assert.equal((await fetch(base + screens[2])).status, 200, "Additional gallery screenshots are public");
+  assert.equal((await request("/api/admin/projects", "PUT", { ...project, desktopImages: Array(9).fill(screens[0]) })).status, 400);
+  assert.equal((await request("/api/admin/projects", "PUT", { ...project, mobileImages: [] })).status, 400, "Published work must retain a mobile screenshot");
+  assert.equal((await request("/api/admin/projects", "PUT", { ...project, desktopImages: [screens[2]], mobileImages: [screens[1]] })).status, 200);
+  project = (await list()).find(item => item.id === project.id);
+  assert.equal(project.desktopImage, screens[2], "Removing the cover promotes the next image");
+  assert.equal((await fetch(base + screens[0])).status, 404, "Removed screenshot no longer public");
+  assert.equal((await fetch(base + screens[3])).status, 404, "Removed mobile screenshot no longer public");
+  assert.equal((await request("/api/admin/projects", "PUT", { ...project, desktopImages: [screens[0], screens[2]] })).status, 200);
+  project = (await list()).find(item => item.id === project.id);
   const html = await (await fetch(base)).text();
   assert.match(html, /Тестовая работа/); assert.ok(html.includes(screens[1]), "Mobile source is rendered without rebuild");
   const image = await fetch(base + screens[0]);
@@ -114,7 +126,7 @@ try {
   assert.equal((await request("/api/admin/projects")).status, 401, "Logout invalidates session on server");
   await login();
   const db = new DatabaseSync(databasePath);
-  assert.equal(db.prepare("PRAGMA user_version").get().user_version, 2);
+  assert.equal(db.prepare("PRAGMA user_version").get().user_version, 3);
   assert.equal(db.prepare("SELECT name FROM inquiries WHERE id = 'legacy-inquiry'").get().name, "Тест");
   db.prepare("UPDATE admin_sessions SET expires_at = 1").run();
   assert.equal((await request("/api/admin/session")).status, 401, "Expired sessions rejected");

@@ -60,7 +60,7 @@ export function PortfolioAdmin() {
 
   const newProject = () => {
     setError(""); setNotice("");
-    setEditing({ id: crypto.randomUUID(), name: "", description: "", url: "", desktopImage: "", mobileImage: "", published: false,
+    setEditing({ id: crypto.randomUUID(), name: "", description: "", url: "", desktopImage: "", mobileImage: "", desktopImages: [], mobileImages: [], published: false,
       position: Math.max(-1, ...projects.map(project => project.position)) + 1, version: 0 });
   };
 
@@ -121,7 +121,7 @@ function ProjectEditor({ initial, onSaved, onCancel }: {
 }) {
   const [draft, setDraft] = useState(initial);
   const [busy, setBusy] = useState(false);
-  const [uploading, setUploading] = useState<"desktopImage" | "mobileImage" | null>(null);
+  const [uploading, setUploading] = useState<"desktopImages" | "mobileImages" | null>(null);
   const [localError, setLocalError] = useState("");
   const [sessionExpired, setSessionExpired] = useState(false);
   const report = (error: unknown) => {
@@ -139,14 +139,18 @@ function ProjectEditor({ initial, onSaved, onCancel }: {
     return () => window.removeEventListener("beforeunload", warn);
   }, [dirty]);
 
-  async function upload(file: File | undefined, field: "desktopImage" | "mobileImage") {
-    if (!file) return;
+  async function upload(files: File[], field: "desktopImages" | "mobileImages") {
+    if (!files.length) return;
     setLocalError("");
-    if (file.size > 8 * 1024 * 1024) { setLocalError("Максимальный размер скриншота – 8 МБ."); return; }
+    if (draft[field].length + files.length > 8) { setLocalError("Можно добавить до 8 скриншотов для каждого экрана."); return; }
+    if (files.some(file => file.size > 8 * 1024 * 1024)) { setLocalError("Максимальный размер одного скриншота – 8 МБ."); return; }
     setUploading(field);
     try {
-      const result = await api<{ path: string }>("/api/admin/images", { method: "POST", headers: { "Content-Type": file.type || "application/octet-stream" }, body: file });
-      change(field, result.path);
+      // Upload sequentially to bound memory; keep successful files if a later one fails.
+      for (const file of files) {
+        const result = await api<{ path: string }>("/api/admin/images", { method: "POST", headers: { "Content-Type": file.type || "application/octet-stream" }, body: file });
+        setDraft(previous => ({ ...previous, [field]: [...previous[field], result.path] }));
+      }
     } catch (error) { report(error); }
     finally { setUploading(null); }
   }
@@ -166,19 +170,20 @@ function ProjectEditor({ initial, onSaved, onCancel }: {
         <label className="admin-wide">Короткое описание<textarea value={draft.description} onChange={event => change("description", event.target.value)} minLength={5} maxLength={350} rows={3} required placeholder="Какую задачу решает сайт" /></label>
       </div>
       <div className="admin-uploads">
-        {(["desktopImage", "mobileImage"] as const).map(field => (
+        {(["desktopImages", "mobileImages"] as const).map(field => (
           <ScreenshotUpload
             key={field}
-            variant={field === "mobileImage" ? "mobile" : "desktop"}
-            source={draft[field]}
+            variant={field === "mobileImages" ? "mobile" : "desktop"}
+            sources={draft[field]}
             projectName={draft.name}
             loading={uploading === field}
             disabled={!!uploading || busy}
-            onSelect={file => { void upload(file, field); }}
+            onSelect={files => { void upload(files, field); }}
+            onRemove={source => setDraft(previous => ({ ...previous, [field]: previous[field].filter(path => path !== source) }))}
           />
         ))}
       </div>
-      <p className="admin-hint">Лучше снять первый экран сайта. Длинные скриншоты тоже подходят – в слайдере видна верхняя часть. На телефоне показывается мобильная версия.</p>
+      <p className="admin-hint">До 8 скриншотов для компьютера и до 8 для телефона. Первый будет обложкой. Удаление применяется после сохранения. Лучше снять первый экран сайта. Длинные скриншоты тоже подходят – в слайдере видна верхняя часть. На телефоне показывается мобильная версия.</p>
       {localError && <p className="admin-error" role="alert">{localError}</p>}
       {sessionExpired && <a className="admin-link" href="/admin" target="_blank" rel="noopener noreferrer">Войти в новой вкладке</a>}
       <label className="admin-switch"><Switch aria-label="Показывать работу на сайте" checked={draft.published} onCheckedChange={value => change("published", value)} /><span>Показывать работу на сайте</span></label>

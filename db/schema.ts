@@ -29,6 +29,8 @@ export const portfolioProjects = sqliteTable("portfolio_projects", {
   url: text("url").notNull(),
   desktopImage: text("desktop_image").notNull().default(""),
   mobileImage: text("mobile_image").notNull().default(""),
+  desktopImages: text("desktop_images", { mode: "json" }).$type<string[]>(),
+  mobileImages: text("mobile_images", { mode: "json" }).$type<string[]>(),
   published: integer("published").notNull().default(0),
   position: integer("position").notNull().default(0),
   version: integer("version").notNull().default(1),

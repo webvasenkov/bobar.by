@@ -733,6 +733,8 @@ h3 {
   flex-shrink: 0;
   padding: env(safe-area-inset-top) max(20px, env(safe-area-inset-right)) 0 max(20px, env(safe-area-inset-left));
 }
+.mobile-panel nav a:last-child { display: flex; align-items: center; gap: 10px; }
+.mobile-panel nav a:last-child svg { flex-shrink: 0; }
 .mobile-panel nav {
   display: flex;
   flex-direction: column;

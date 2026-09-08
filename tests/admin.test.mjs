@@ -23,7 +23,7 @@ test("Cloudflare D1/R2 support admin login, screenshots, publication and reorder
   });
   try {
     const database = await runtime.getD1Database("DB");
-    for (const file of ["0000_skinny_sersi.sql", "0001_cynical_black_cat.sql"])
+    for (const file of ["0000_skinny_sersi.sql", "0001_cynical_black_cat.sql", "0002_big_adam_destine.sql"])
       for (const sql of (await readFile(`drizzle/${file}`, "utf8")).split("--> statement-breakpoint"))
         if (sql.trim()) await database.prepare(sql).run();
     assert.equal((await request("/api/admin/projects")).status, 401);
@@ -38,7 +38,7 @@ test("Cloudflare D1/R2 support admin login, screenshots, publication and reorder
     assert.equal(upload.status, 201);
     const { path } = await upload.json();
     assert.equal((await runtime.dispatchFetch(origin + path)).status, 404);
-    const save = await request("/api/admin/projects", "PUT", { ...projects[0], mobileImage: path });
+    const save = await request("/api/admin/projects", "PUT", { ...projects[0], mobileImage: path, mobileImages: [path] });
     assert.equal(save.status, 200);
     const updated = (await save.json())[0];
     assert.equal((await runtime.dispatchFetch(origin + path)).status, 200);

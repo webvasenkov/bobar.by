@@ -27,6 +27,7 @@ export function HeroMark() {
       if (event.pointerType !== "mouse" || preference.matches || mark.dataset.intro === "active") return;
       const bounds = hero.getBoundingClientRect();
       const markBounds = mark.getBoundingClientRect();
+      if (markBounds.bottom < 0 || markBounds.top > window.innerHeight) return;
       const centerX = markBounds.left + markBounds.width * (130.5 / 240);
       const centerY = markBounds.top + markBounds.height * (216 / 280);
       const normalize = (value: number) => Math.max(-1, Math.min(1, value));
@@ -47,14 +48,14 @@ export function HeroMark() {
         mark.style.setProperty("--tilt", `${-y * 5}deg`);
       });
     };
-    hero.addEventListener("pointermove", move, { passive: true });
-    hero.addEventListener("pointerleave", reset);
+    window.addEventListener("pointermove", move, { passive: true });
+    document.documentElement.addEventListener("pointerleave", reset);
     window.addEventListener("blur", reset);
     preference.addEventListener("change", reset);
     return () => {
       reset();
-      hero.removeEventListener("pointermove", move);
-      hero.removeEventListener("pointerleave", reset);
+      window.removeEventListener("pointermove", move);
+      document.documentElement.removeEventListener("pointerleave", reset);
       window.removeEventListener("blur", reset);
       preference.removeEventListener("change", reset);
     };
