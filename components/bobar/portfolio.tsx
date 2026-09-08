@@ -1,0 +1,137 @@
+"use client";
+
+import { useCallback, useEffect, useState } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { projects } from "@/lib/content";
+import { BrandMark } from "./brand";
+
+export function Portfolio() {
+  const [viewportRef, api] = useEmblaCarousel({
+    loop: false,
+    align: "start",
+    containScroll: "trimSnaps",
+    duration: 28,
+  });
+  const [selected, setSelected] = useState(0);
+  const [reducedMotion, setReducedMotion] = useState(false);
+  const total = projects.length + 1;
+  useEffect(() => {
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const update = () => setReducedMotion(preference.matches);
+    update();
+    preference.addEventListener("change", update);
+    return () => preference.removeEventListener("change", update);
+  }, []);
+  useEffect(() => {
+    if (!api) return;
+    const update = () => setSelected(api.selectedScrollSnap());
+    update();
+    api.on("select", update);
+    api.on("reInit", update);
+    return () => {
+      api.off("select", update);
+      api.off("reInit", update);
+    };
+  }, [api]);
+  const move = useCallback(
+    (direction: number) => api?.scrollTo(selected + direction, reducedMotion),
+    [api, selected, reducedMotion],
+  );
+
+  return (
+    <section
+      id="work"
+      className="portfolio container"
+      aria-labelledby="work-title"
+      aria-roledescription="карусель"
+      onKeyDown={(event) => {
+        if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
+          event.preventDefault();
+          move(event.key === "ArrowRight" ? 1 : -1);
+        }
+      }}
+    >
+      <div className="portfolio-heading">
+        <h2 id="work-title">Мои работы.</h2>
+      </div>
+      <div className="portfolio-viewport" ref={viewportRef}>
+        <div className="portfolio-track">
+          {projects.map((project, index) => (
+            <article
+              className="project-slide"
+              key={project.url}
+              aria-label={`${index + 1} из ${total}: ${project.name}`}
+              aria-roledescription="слайд"
+              aria-hidden={selected !== index}
+              inert={selected !== index}
+            >
+              <div className="project-preview">
+                <img
+                  src={project.image}
+                  width={project.width}
+                  height={project.height}
+                  className={project.imageClass}
+                  alt={`Главная страница сайта «${project.name}»`}
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div className="project-caption">
+                <div>
+                  <h3>{project.name}</h3>
+                  <p>{project.description}</p>
+                </div>
+                <a href={project.url} target="_blank" rel="noopener noreferrer">
+                  Открыть сайт <ArrowUpRight size={18} />
+                </a>
+              </div>
+            </article>
+          ))}
+          <article
+            className="project-slide invitation-slide"
+            aria-label="4 из 4: Ваш будущий сайт"
+            aria-roledescription="слайд"
+            aria-hidden={selected !== 3}
+            inert={selected !== 3}
+          >
+            <div className="invitation">
+              <BrandMark />
+              <h3>
+                Здесь может быть
+                <br />
+                ваш сайт.
+              </h3>
+              <p>Следующий проект – для вашего бизнеса.</p>
+              <a className="button" href="#contact">
+                Обсудить проект <ArrowRight size={20} />
+              </a>
+            </div>
+            <div className="project-caption invitation-caption">
+              <p>Давайте начнём с вашей идеи.</p>
+            </div>
+          </article>
+        </div>
+      </div>
+      <div className="carousel-controls" aria-label="Переключение работ">
+        <button
+          onClick={() => move(-1)}
+          disabled={selected === 0}
+          aria-label="Предыдущая работа"
+        >
+          <ArrowLeft />
+        </button>
+        <span aria-live="polite" aria-atomic="true">
+          {selected + 1} / {total}
+        </span>
+        <button
+          onClick={() => move(1)}
+          disabled={selected === total - 1}
+          aria-label="Следующая работа"
+        >
+          <ArrowRight />
+        </button>
+      </div>
+    </section>
+  );
+}

@@ -1,0 +1,10 @@
+bobar.by {
+    encode zstd gzip
+    request_body {
+        max_size 16KB
+    }
+    reverse_proxy app:3000 {
+        header_up X-Bobar-Client-IP {remote_host}
+        header_up -CF-Connecting-IP
+    }
+}
