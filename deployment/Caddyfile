@@ -1,6 +1,11 @@
 bobar.by {
     encode zstd gzip
-    request_body {
+    @image_upload path /api/admin/images
+    request_body @image_upload {
+        max_size 8MB
+    }
+    @regular_request not path /api/admin/images
+    request_body @regular_request {
         max_size 16KB
     }
     reverse_proxy app:3000 {

@@ -3,10 +3,10 @@
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
-import { projects } from "@/lib/content";
+import type { Project } from "@/lib/project-types";
 import { BrandMark } from "./brand";
 
-export function Portfolio() {
+export function Portfolio({ projects }: { projects: Project[] }) {
   const [viewportRef, api] = useEmblaCarousel({
     loop: false,
     align: "start",
@@ -58,42 +58,47 @@ export function Portfolio() {
       <div className="portfolio-viewport" ref={viewportRef}>
         <div className="portfolio-track">
           {projects.map((project, index) => (
-            <article
-              className="project-slide"
-              key={project.url}
+            <a
+              href={project.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              draggable={false}
+              className="project-slide project-link"
+              key={project.id}
               aria-label={`${index + 1} из ${total}: ${project.name}`}
               aria-roledescription="слайд"
               aria-hidden={selected !== index}
               inert={selected !== index}
             >
               <div className="project-preview">
+                <picture>
+                  {project.mobileImage && <source media="(max-width: 767px)" srcSet={project.mobileImage} />}
                 <img
-                  src={project.image}
-                  width={project.width}
-                  height={project.height}
-                  className={project.imageClass}
+                  src={project.desktopImage}
                   alt={`Главная страница сайта «${project.name}»`}
+                  draggable={false}
                   loading="lazy"
                   decoding="async"
                 />
+                </picture>
               </div>
               <div className="project-caption">
                 <div>
                   <h3>{project.name}</h3>
                   <p>{project.description}</p>
                 </div>
-                <a href={project.url} target="_blank" rel="noopener noreferrer">
+                <span className="project-open">
                   Открыть сайт <ArrowUpRight size={18} />
-                </a>
+                </span>
               </div>
-            </article>
+            </a>
           ))}
           <article
             className="project-slide invitation-slide"
-            aria-label="4 из 4: Ваш будущий сайт"
+            aria-label={`${total} из ${total}: Ваш будущий сайт`}
             aria-roledescription="слайд"
-            aria-hidden={selected !== 3}
-            inert={selected !== 3}
+            aria-hidden={selected !== projects.length}
+            inert={selected !== projects.length}
           >
             <div className="invitation">
               <BrandMark />

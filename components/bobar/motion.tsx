@@ -20,6 +20,8 @@ export function HeroMark() {
       mark.style.setProperty("--tilt", "0deg");
       mark.style.setProperty("--teeth-x", "0px");
       mark.style.setProperty("--teeth-y", "0px");
+      mark.style.setProperty("--eye-x", "0px");
+      mark.style.setProperty("--eye-y", "0px");
     };
     const move = (event: PointerEvent) => {
       if (event.pointerType !== "mouse" || preference.matches || mark.dataset.intro === "active") return;
@@ -35,8 +37,10 @@ export function HeroMark() {
       const distance = Math.max(1, Math.hypot(dx, dy));
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => {
-        mark.style.setProperty("--teeth-x", `${(dx / distance) * 22}px`);
-        mark.style.setProperty("--teeth-y", `${(dy / distance) * 15}px`);
+        mark.style.setProperty("--teeth-x", `${(dx / distance) * 3}px`);
+        mark.style.setProperty("--teeth-y", `${(dy / distance) * 2}px`);
+        mark.style.setProperty("--eye-x", `${(dx / distance) * 8}px`);
+        mark.style.setProperty("--eye-y", `${(dy / distance) * 7}px`);
         mark.style.setProperty("--mark-x", `${x * 7}px`);
         mark.style.setProperty("--mark-y", `${y * 5}px`);
         mark.style.setProperty("--rotate", `${x * 7}deg`);
@@ -66,7 +70,10 @@ export function HeroMark() {
 
 export function RevealEffects() {
   useEffect(() => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    const preference = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (preference.matches || !("IntersectionObserver" in window)) return;
+    const elements = [...document.querySelectorAll<HTMLElement>("[data-reveal]")];
+    const showAll = () => elements.forEach((element) => element.classList.add("is-visible"));
     const observer = new IntersectionObserver(
       (entries) =>
         entries.forEach((entry) => {
@@ -77,11 +84,31 @@ export function RevealEffects() {
         }),
       { threshold: 0.08 },
     );
-    document.querySelectorAll("[data-reveal]").forEach((element) => {
+    elements.forEach((element) => {
+      // Content already painted in the viewport must never disappear on hydration.
+      if (element.getBoundingClientRect().top < innerHeight) return;
       element.classList.add("will-reveal");
       observer.observe(element);
     });
-    return () => observer.disconnect();
+    const onPreference = () => {
+      if (preference.matches) {
+        showAll();
+        observer.disconnect();
+      }
+    };
+    const onFocus = (event: FocusEvent) => {
+      if (event.target instanceof Element) {
+        event.target.closest("[data-reveal]")?.classList.add("is-visible");
+      }
+    };
+    preference.addEventListener("change", onPreference);
+    document.addEventListener("focusin", onFocus);
+    return () => {
+      observer.disconnect();
+      elements.forEach((element) => element.classList.remove("will-reveal", "is-visible"));
+      preference.removeEventListener("change", onPreference);
+      document.removeEventListener("focusin", onFocus);
+    };
   }, []);
   return null;
 }

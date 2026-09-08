@@ -24,10 +24,9 @@ test("inquiry API validates, persists once, rejects cross-origin and rate-limits
   });
   try {
     const database = await runtime.getD1Database("DB");
-    const migration = await readFile("drizzle/0000_skinny_sersi.sql", "utf8");
-    for (const sql of migration.split("--> statement-breakpoint")) {
-      if (sql.trim()) await database.prepare(sql).run();
-    }
+    for (const file of ["0000_skinny_sersi.sql", "0001_cynical_black_cat.sql"])
+      for (const sql of (await readFile(`drizzle/${file}`, "utf8")).split("--> statement-breakpoint"))
+        if (sql.trim()) await database.prepare(sql).run();
     const payload = {
       name: "Тест",
       contact: "@bobar_test",

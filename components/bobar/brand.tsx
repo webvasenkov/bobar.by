@@ -17,9 +17,19 @@ export function BrandMark({ movingTeeth = false, eyes = false, ...props }: SVGPr
       {eyes && (
         <g className="mascot-eyes">
           {[105, 160].map((x) => (
-            <g className="mascot-eye" key={x}>
-              <circle cx={x} cy="166" r="20" fill="var(--background)" />
-              <circle className="mascot-pupil" cx={x} cy="166" r="10" />
+            <g key={x}>
+              <g className="mascot-eye">
+                <circle cx={x} cy="166" r="20" fill="var(--background)" />
+                <circle className="mascot-pupil" cx={x} cy="166" r="12" />
+              </g>
+              <path
+                className="mascot-sleep"
+                d={`M${x - 15} 166q15 -16 30 0`}
+                fill="none"
+                stroke="var(--background)"
+                strokeWidth="5"
+                strokeLinecap="round"
+              />
             </g>
           ))}
         </g>

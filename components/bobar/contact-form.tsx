@@ -61,7 +61,7 @@ export function ContactForm() {
       </div>
     );
   return (
-    <form className="contact-form" onSubmit={handleSubmit(submit)} noValidate>
+    <form className="contact-form" onSubmit={(event) => void handleSubmit(submit)(event)} noValidate>
       <div className="form-row">
         <div className="field">
           <label htmlFor="name">Имя</label>

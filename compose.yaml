@@ -8,8 +8,12 @@ services:
       SITE_ORIGIN: https://bobar.by
       TELEGRAM_BOT_TOKEN: ${TELEGRAM_BOT_TOKEN:-}
       TELEGRAM_CHAT_ID: ${TELEGRAM_CHAT_ID:-}
+      ADMIN_USERNAME: ${ADMIN_USERNAME:-}
+      ADMIN_PASSWORD_HASH: ${ADMIN_PASSWORD_HASH:-}
+      UPLOADS_PATH: /app/uploads
     volumes:
       - app_data:/app/data
+      - uploads:/app/uploads
     expose:
       - "3000"
     healthcheck:
@@ -44,5 +48,6 @@ services:
         max-file: "3"
 volumes:
   app_data:
+  uploads:
   caddy_data:
   caddy_config:

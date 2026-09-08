@@ -6,10 +6,18 @@ import { Portfolio } from "@/components/bobar/portfolio";
 import { Faq } from "@/components/bobar/faq";
 import { ContactForm } from "@/components/bobar/contact-form";
 import { steps } from "@/lib/content";
+import { listProjects } from "@/lib/projects";
+import type { Project } from "@/lib/project-types";
+
+export const dynamic = "force-dynamic";
 
 const stepIcons = [MessagesSquare, ListChecks, Code2, Rocket];
 
-export default function Home() {
+export default async function Home() {
+  let projects: Project[] = [];
+  let portfolioUnavailable = false;
+  try { projects = await listProjects(); }
+  catch { portfolioUnavailable = true; console.error("Portfolio storage unavailable"); }
   return (
     <div id="top">
       <a className="skip-link" href="#main">
@@ -39,7 +47,9 @@ export default function Home() {
           </div>
           <HeroMark />
         </section>
-        <Portfolio />
+        {portfolioUnavailable ? <section id="work" className="section container">
+          <h2>Мои работы.</h2><p className="subtitle">Не удалось загрузить работы. Попробуйте обновить страницу.</p>
+        </section> : <Portfolio projects={projects} />}
         <section
           id="pricing"
           className="pricing section container"
@@ -57,7 +67,7 @@ export default function Home() {
                 <div key={name}>
                   <dt>{name}</dt>
                   <dd>
-                    от {price} <span>BYN</span>
+                    от {price}{"\u00a0"}<img className="currency-symbol" src="/byn-symbol.svg" width="24" height="24" alt="белорусских рублей" />
                   </dd>
                 </div>
               ))}
@@ -116,20 +126,15 @@ export default function Home() {
             <ul className="promises">
               <li>
                 <MessageCircle aria-hidden="true" size={25} strokeWidth={1.5} />
-                <span>Напрямую
-                <br />с разработчиком.</span>
+                <span>Напрямую{" "}<br />с разработчиком.</span>
               </li>
               <li>
                 <LockKeyhole aria-hidden="true" size={25} strokeWidth={1.5} />
-                <span>Цена фиксируется
-                <br />
-                заранее.</span>
+                <span>Цена фиксируется{" "}<br />заранее.</span>
               </li>
               <li>
                 <Headphones aria-hidden="true" size={25} strokeWidth={1.5} />
-                <span>Остаюсь на связи
-                <br />
-                после запуска.</span>
+                <span>Остаюсь на связи{" "}<br />после запуска.</span>
               </li>
             </ul>
           </div>
