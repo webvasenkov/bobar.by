@@ -11,9 +11,6 @@ export function ProjectGallery({ project, active }: { project: Project; active: 
   const [index, setIndex] = useState(0);
   const [mobile, setMobile] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [paused, setPaused] = useState(false);
-  const animation = useRef<gsap.core.Tween | null>(null);
-  const pauseRef = useRef(false);
   const [reduced, setReduced] = useState(true);
   const desktop = project.desktopImages;
   const phone = project.mobileImages.length ? project.mobileImages : desktop;
@@ -36,26 +33,14 @@ export function ProjectGallery({ project, active }: { project: Project; active: 
     screen.addEventListener("change", update);
     motion.addEventListener("change", update);
     document.addEventListener("visibilitychange", update);
-    const link = element.closest("a");
-    const focus = () => setPaused(true);
-    const blur = () => setPaused(false);
-    link?.addEventListener("focus", focus);
-    link?.addEventListener("blur", blur);
     update();
     return () => {
       observer.disconnect();
       screen.removeEventListener("change", update);
       motion.removeEventListener("change", update);
       document.removeEventListener("visibilitychange", update);
-      link?.removeEventListener("focus", focus);
-      link?.removeEventListener("blur", blur);
     };
   }, []);
-
-  useEffect(() => {
-    pauseRef.current = paused;
-    animation.current?.paused(paused);
-  }, [paused]);
 
   const playing = active && visible && !reduced && count > 1;
   useLayoutEffect(() => {
@@ -65,13 +50,23 @@ export function ProjectGallery({ project, active }: { project: Project; active: 
     let cancelled = false;
     let tween: gsap.core.Tween | undefined;
     gsap.set(layer, { opacity: 0 });
-    void image.decode().then(() => {
-      if (cancelled) return;
+    const start = () => {
+      if (cancelled || tween || !image.complete || !image.naturalWidth) return;
       tween = gsap.to(layer, { opacity: 1, duration: 0.8, delay: 4,
-        paused: pauseRef.current, ease: "sine.inOut", onComplete: () => setIndex(next) });
-      animation.current = tween;
-    }).catch(() => { /* Keep the current screenshot if the next image fails. */ });
-    return () => { cancelled = true; tween?.kill(); animation.current = null; gsap.set(layer, { opacity: 0 }); };
+        ease: "sine.inOut", onComplete: () => setIndex(next) });
+    };
+    // A responsive <picture> may abort decode while selecting its new source.
+    // Its load event restarts preparation instead of leaving the gallery stuck.
+    image.addEventListener("load", start);
+    void image.decode().then(start).catch(() => {
+      if (image.complete && image.naturalWidth) start();
+    });
+    return () => {
+      cancelled = true;
+      image.removeEventListener("load", start);
+      tween?.kill();
+      gsap.set(layer, { opacity: 0 });
+    };
   }, [playing, index, next, mobile]);
 
   const picture = (position: number, overlay = false) => (
@@ -83,8 +78,7 @@ export function ProjectGallery({ project, active }: { project: Project; active: 
     </picture>
   );
 
-  return <div className="project-preview" ref={root}
-    onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)}>
+  return <div className="project-preview" ref={root}>
     {picture(index)}
     {playing && picture(next, true)}
   </div>;

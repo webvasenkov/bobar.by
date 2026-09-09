@@ -1199,8 +1199,11 @@ h3 {
   transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .project-link:hover .project-open, .project-link:focus-visible .project-open { color: #b83910; }
-.portfolio-viewport { container-type: size; }
-.project-link { align-items: center; justify-content: center; padding: 5px 0 24px; }
+.portfolio-stage { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; container-type: size; padding: 5px 0 24px; }
+.device-screen .portfolio-viewport { position: absolute; inset: 0; }
+.device-screen .project-slide { position: relative; }
+.device-screen .invitation { border-radius: 0; }
+.project-link { padding: 0; }
 .device-shell {
   position: relative;
   flex: none;
@@ -1262,7 +1265,7 @@ h3 {
   transition: none;
 }
 .device-screen .project-caption h3 { font-size: clamp(20px, 2.1vw, 30px); line-height: 1.2; max-width: none; }
-.device-screen .project-caption p { color: #f3f3f3; font-size: 16px; line-height: 1.45; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.device-screen .project-caption p { color: #f3f3f3; font-weight: 400; font-size: 16px; line-height: 1.45; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
 .device-screen .project-open { color: #fff; flex-shrink: 0; }
 .project-link:hover .device-screen .project-open, .project-link:focus-visible .device-screen .project-open { color: #fff; }
 .portfolio-dots { display: flex; justify-content: center; gap: 2px; flex: none; height: 24px; margin-top: -10px; }
@@ -1270,7 +1273,7 @@ h3 {
 .portfolio-dots span { width: 18px; height: 6px; border-radius: 4px; background: #cecdca; transition: background-color 200ms ease; }
 .portfolio-dots [aria-current="true"] span { background: var(--accent); }
 @media (max-width: 767px) {
-  .project-link { padding: 4px 0; }
+  .portfolio-stage { padding: 4px 0; }
   .device-shell {
     width: min(96%, calc((100cqh - 8px) / 2.05));
     aspect-ratio: 1 / 2.05;
@@ -1284,7 +1287,7 @@ h3 {
   .device-camera { z-index: 4; top: 16px; left: 35%; width: 30%; height: 22px; border: 0; border-radius: 20px; background: #050505; }
   .device-status { position: absolute; inset: 0 0 auto; z-index: 3; display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 4px 20px 0; font-size: 11px; font-weight: 600; color: #111; background: #fff; }
   .device-status > span:last-child { display: flex; align-items: center; gap: 3px; }
-  .device-screen .project-preview { top: 34px; }
+  .device-screen .portfolio-viewport { top: 34px; }
   .device-screen .project-caption { display: block; padding: 60px 17px 22px; }
   .device-screen .project-caption h3 { font-size: clamp(18px, 5.2vw, 23px); line-height: 1.15; }
   .device-screen .project-caption p { font-size: 14px; line-height: 1.4; margin-top: 7px; }

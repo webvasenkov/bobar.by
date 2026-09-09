@@ -85,64 +85,63 @@ export function Portfolio({ projects }: { projects: Project[] }) {
       <div className="portfolio-heading">
         <h2 id="work-title">Мои работы</h2>
       </div>
-      <div className="portfolio-viewport" ref={viewportRef}>
-        <div className="portfolio-track">
-          {projects.map((project, index) => (
-            <a
-              href={project.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              draggable={false}
-              className="project-slide project-link"
-              key={project.id}
-              aria-label={`${index + 1} из ${total}: ${project.name}`}
-              aria-roledescription="слайд"
-              aria-hidden={selected !== index}
-              inert={selected !== index}
-            >
-              <div className="device-shell">
-                <span className="device-camera" aria-hidden="true" />
-                <div className="device-screen">
-                  <div className="device-status" aria-hidden="true">
-                    <span>9:41</span><span><Signal size={13} /><Wifi size={13} /><BatteryFull size={17} /></span>
-                  </div>
-                  <ProjectGallery project={project} active={selected === index} />
-                  <div className="project-caption">
-                    <div>
-                      <h3>{project.name.replace(/\.+$/, "")}</h3>
-                      <p>{project.description}</p>
+      <div className="portfolio-stage">
+        <div className="device-shell">
+          <span className="device-camera" aria-hidden="true" />
+          <div className="device-screen">
+            <div className="device-status" aria-hidden="true">
+              <span>9:41</span><span><Signal size={13} /><Wifi size={13} /><BatteryFull size={17} /></span>
+            </div>
+            <div className="portfolio-viewport" ref={viewportRef}>
+              <div className="portfolio-track">
+                {projects.map((project, index) => (
+                  <a
+                    href={project.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    draggable={false}
+                    className="project-slide project-link"
+                    key={project.id}
+                    aria-label={`${index + 1} из ${total}: ${project.name}`}
+                    aria-roledescription="слайд"
+                    aria-hidden={selected !== index}
+                    inert={selected !== index}
+                  >
+                    <ProjectGallery project={project} active={selected === index} />
+                    <div className="project-caption">
+                      <div>
+                        <h3>{project.name.replace(/\.+$/, "")}</h3>
+                        <p>{project.description}</p>
+                      </div>
+                      <span className="project-open">
+                        Открыть сайт <ArrowUpRight size={18} />
+                      </span>
                     </div>
-                    <span className="project-open">
-                      Открыть сайт <ArrowUpRight size={18} />
-                    </span>
+                  </a>
+                ))}
+                <article
+                  className="project-slide invitation-slide"
+                  aria-label={`${total} из ${total}: Ваш будущий сайт`}
+                  aria-roledescription="слайд"
+                  aria-hidden={selected !== projects.length}
+                  inert={selected !== projects.length}
+                >
+                  <div className="invitation">
+                    <BrandMark />
+                    <h3>
+                      Здесь может быть
+                      <br />
+                      ваш сайт
+                    </h3>
+                    <p>Следующий проект – для вашего бизнеса.</p>
+                    <a className="button" href="#contact">
+                      Обсудить проект <ArrowRight size={20} />
+                    </a>
                   </div>
-                </div>
+                </article>
               </div>
-            </a>
-          ))}
-          <article
-            className="project-slide invitation-slide"
-            aria-label={`${total} из ${total}: Ваш будущий сайт`}
-            aria-roledescription="слайд"
-            aria-hidden={selected !== projects.length}
-            inert={selected !== projects.length}
-          >
-            <div className="invitation">
-              <BrandMark />
-              <h3>
-                Здесь может быть
-                <br />
-                ваш сайт
-              </h3>
-              <p>Следующий проект – для вашего бизнеса.</p>
-              <a className="button" href="#contact">
-                Обсудить проект <ArrowRight size={20} />
-              </a>
             </div>
-            <div className="project-caption invitation-caption">
-              <p>Давайте начнём с вашей идеи.</p>
-            </div>
-          </article>
+          </div>
         </div>
       </div>
       <div className="portfolio-dots" aria-label="Выбор работы">
