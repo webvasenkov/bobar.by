@@ -5,6 +5,7 @@ import { HeroMark, RevealEffects } from "@/components/bobar/motion";
 import { Portfolio } from "@/components/bobar/portfolio";
 import { HeroSlogans } from "@/components/bobar/hero-slogans";
 import { Faq } from "@/components/bobar/faq";
+import { ContactLinks } from "@/components/bobar/contact-links";
 import { ContactForm } from "@/components/bobar/contact-form";
 import { steps } from "@/lib/content";
 import { listProjects } from "@/lib/projects";
@@ -153,6 +154,7 @@ export default async function Home() {
             Расскажите о задаче – я предложу решение,
             <br className="desktop-break" /> стоимость и сроки.
           </p>
+          <ContactLinks />
           <ContactForm />
         </section>
       </main>

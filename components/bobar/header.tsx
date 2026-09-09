@@ -10,6 +10,7 @@ import {
   SheetClose,
 } from "@/components/ui/sheet";
 import { Brand } from "./brand";
+import { ContactLinks } from "./contact-links";
 
 const links = [
   ["#work", "Работы"],
@@ -99,6 +100,7 @@ export function Header() {
               </a>
             ))}
           </nav>
+          <ContactLinks className="mobile-panel-contacts" />
         </SheetContent>
       </Sheet>
     </header>

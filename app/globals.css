@@ -583,6 +583,35 @@ h3 {
   margin-inline: auto;
   text-align: left;
 }
+.contact-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 28px;
+  max-width: 650px;
+  margin: 0 auto 36px;
+  font-size: 16px;
+  font-style: normal;
+  line-height: 1.5;
+}
+.contact-links a {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+}
+.contact-links svg {
+  flex-shrink: 0;
+}
+.contact-links a:hover,
+.contact-links a:focus-visible {
+  color: var(--accent);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .contact-links a {
+    transition: color 250ms ease;
+  }
+}
 .form-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -772,6 +801,16 @@ h3 {
   letter-spacing: -0.025em;
   color: var(--accent);
   animation-delay: 190ms;
+}
+.mobile-panel .mobile-panel-contacts {
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  gap: 4px;
+  max-width: none;
+  margin: auto 0 0;
+  padding: 16px max(40px, env(safe-area-inset-right)) max(32px, env(safe-area-inset-bottom)) max(40px, env(safe-area-inset-left));
+  color: var(--muted);
 }
 .menu-close {
   display: grid;
@@ -1077,6 +1116,12 @@ h3 {
   }
   .contact > .subtitle {
     margin: 25px 0 30px;
+  }
+  .contact-links {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 32px;
   }
   .form-row {
     display: block;
