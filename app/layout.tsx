@@ -26,6 +26,9 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="ru">
+      <head>
+        <link rel="preload" href="/fonts/arimo-latin-cyrillic-v1.woff2" as="font" type="font/woff2" crossOrigin="anonymous" />
+      </head>
       <body>
         {children}
         <script

@@ -53,7 +53,7 @@ export function ContactForm() {
     return (
       <div className="form-success" role="status">
         <Check size={34} />
-        <h3>Заявка получена.</h3>
+        <h3>Заявка получена</h3>
         <p>
           Спасибо! Я свяжусь с вами по указанному номеру или в Telegram, чтобы
           обсудить проект.

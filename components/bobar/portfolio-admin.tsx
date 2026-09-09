@@ -81,7 +81,7 @@ export function PortfolioAdmin() {
     </header>
     {signedIn === null ? <p role="status">Проверяем вход…</p> : !signedIn ?
       <section className="admin-login">
-        <h1>Ваши работы.</h1><p>Войдите, чтобы обновить портфолио.</p>
+        <h1>Ваши работы</h1><p>Войдите, чтобы обновить портфолио.</p>
         <form onSubmit={login}>
           <label>Логин<input name="username" autoComplete="username" required autoCapitalize="none" spellCheck={false} /></label>
           <label>Пароль<input name="password" type="password" autoComplete="current-password" required /></label>
@@ -94,7 +94,7 @@ export function PortfolioAdmin() {
       {editing ? <ProjectEditor key={editing.id} initial={editing} onCancel={() => { setEditing(null); setError(""); }} onSaved={data => {
         setProjects(data); setEditing(null); setError(""); setNotice("Работа сохранена. Опубликованные изменения уже доступны на сайте.");
       }} /> : <>
-        <div className="admin-title"><div><h1>Мои работы.</h1><p>{projects.filter(project => project.published).length} на сайте · {projects.length} всего</p></div>
+        <div className="admin-title"><div><h1>Мои работы</h1><p>{projects.filter(project => project.published).length} на сайте · {projects.length} всего</p></div>
           <button className="button" onClick={newProject} disabled={busy}><Plus size={20} /> Добавить работу</button></div>
         <div className="admin-projects">
           {projects.map((project, index) => <article className="admin-project" key={project.id}>
@@ -162,7 +162,7 @@ function ProjectEditor({ initial, onSaved, onCancel }: {
     finally { setBusy(false); }
   }
   return <section className="admin-editor">
-    <div className="admin-title"><h1>{initial.version ? "Редактировать работу." : "Новая работа."}</h1></div>
+    <div className="admin-title"><h1>{initial.version ? "Редактировать работу" : "Новая работа"}</h1></div>
     <form onSubmit={save}>
       <div className="admin-fields">
         <label>Название<input value={draft.name} onChange={event => change("name", event.target.value)} maxLength={100} minLength={2} required placeholder="Название проекта" /></label>

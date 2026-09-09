@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { ArrowLeft, ArrowRight, ArrowUpRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, BatteryFull, Signal, Wifi } from "lucide-react";
 import type { Project } from "@/lib/project-types";
 import { BrandMark } from "./brand";
 import { ProjectGallery } from "./project-gallery";
@@ -83,7 +83,7 @@ export function Portfolio({ projects }: { projects: Project[] }) {
       }}
     >
       <div className="portfolio-heading">
-        <h2 id="work-title">Мои работы.</h2>
+        <h2 id="work-title">Мои работы</h2>
       </div>
       <div className="portfolio-viewport" ref={viewportRef}>
         <div className="portfolio-track">
@@ -100,15 +100,23 @@ export function Portfolio({ projects }: { projects: Project[] }) {
               aria-hidden={selected !== index}
               inert={selected !== index}
             >
-              <ProjectGallery project={project} active={selected === index} />
-              <div className="project-caption">
-                <div>
-                  <h3>{project.name}</h3>
-                  <p>{project.description}</p>
+              <div className="device-shell">
+                <span className="device-camera" aria-hidden="true" />
+                <div className="device-screen">
+                  <div className="device-status" aria-hidden="true">
+                    <span>9:41</span><span><Signal size={13} /><Wifi size={13} /><BatteryFull size={17} /></span>
+                  </div>
+                  <ProjectGallery project={project} active={selected === index} />
+                  <div className="project-caption">
+                    <div>
+                      <h3>{project.name.replace(/\.+$/, "")}</h3>
+                      <p>{project.description}</p>
+                    </div>
+                    <span className="project-open">
+                      Открыть сайт <ArrowUpRight size={18} />
+                    </span>
+                  </div>
                 </div>
-                <span className="project-open">
-                  Открыть сайт <ArrowUpRight size={18} />
-                </span>
               </div>
             </a>
           ))}
@@ -124,7 +132,7 @@ export function Portfolio({ projects }: { projects: Project[] }) {
               <h3>
                 Здесь может быть
                 <br />
-                ваш сайт.
+                ваш сайт
               </h3>
               <p>Следующий проект – для вашего бизнеса.</p>
               <a className="button" href="#contact">
@@ -136,6 +144,12 @@ export function Portfolio({ projects }: { projects: Project[] }) {
             </div>
           </article>
         </div>
+      </div>
+      <div className="portfolio-dots" aria-label="Выбор работы">
+        {Array.from({ length: total }, (_, index) => <button key={index}
+          type="button" aria-label={`Показать ${index + 1}: ${projects[index]?.name || "Ваш будущий сайт"}`}
+          aria-current={selected === index ? "true" : undefined}
+          onClick={() => api?.scrollTo(index, reducedMotion)}><span /></button>)}
       </div>
       <div className="carousel-controls" aria-label="Переключение работ">
         <button

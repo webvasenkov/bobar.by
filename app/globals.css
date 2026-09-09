@@ -1,6 +1,14 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@font-face {
+  font-family: "Arimo";
+  src: url("/fonts/arimo-latin-cyrillic-v1.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 400 700;
+  font-display: swap;
+}
+
 :root {
   --background: #faf9f6;
   --foreground: #191919;
@@ -10,7 +18,7 @@
   --line: #deddd9;
   --ring: #191919;
   --radius: 0.75rem;
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Arimo", Arial, Helvetica, sans-serif;
   color: var(--foreground);
   background: var(--background);
   font-synthesis: none;
@@ -1191,6 +1199,98 @@ h3 {
   transition: transform 400ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .project-link:hover .project-open, .project-link:focus-visible .project-open { color: #b83910; }
+.portfolio-viewport { container-type: size; }
+.project-link { align-items: center; justify-content: center; padding: 5px 0 24px; }
+.device-shell {
+  position: relative;
+  flex: none;
+  width: min(90%, calc((100cqh - 34px) * 1.55));
+  aspect-ratio: 1.55;
+  padding: 25px 12px 16px;
+  border: 2px solid #77787a;
+  border-radius: 28px 28px 8px 8px;
+  background: #0b0c0d;
+  box-shadow: inset 0 0 0 2px #28292b;
+}
+.device-shell::after {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  top: calc(100% - 1px);
+  left: -8%;
+  width: 116%;
+  height: 22px;
+  border-radius: 1px 1px 50% 50% / 1px 1px 85% 85%;
+  background: linear-gradient(90deg, #55575a, #a2a3a5 5%, #686a6d 22%, #a1a3a5 50%, #686a6d 78%, #a2a3a5 95%, #55575a);
+  border-bottom: 5px solid #393b3d;
+}
+.device-shell::before {
+  content: "";
+  position: absolute;
+  z-index: 4;
+  top: 100%;
+  left: 40%;
+  width: 20%;
+  height: 8px;
+  border-radius: 0 0 12px 12px;
+  background: #505255;
+}
+.device-camera {
+  position: absolute;
+  width: 6px;
+  height: 6px;
+  left: calc(50% - 3px);
+  top: 10px;
+  border: 2px solid #292e35;
+  background: #101c29;
+  border-radius: 50%;
+}
+.device-screen { position: relative; width: 100%; height: 100%; overflow: hidden; background: #fff; }
+.device-screen .project-preview { position: absolute; inset: 0; border: 0; border-radius: 0; }
+.device-status { display: none; }
+.device-screen .project-caption {
+  position: absolute;
+  z-index: 2;
+  inset: auto 0 0;
+  min-height: 0;
+  align-items: flex-end;
+  padding: 65px 5% 28px;
+  color: #fff;
+  background: linear-gradient(transparent, rgb(0 0 0 / 82%) 45%, rgb(0 0 0 / 94%));
+  opacity: 1;
+  transform: none;
+  transition: none;
+}
+.device-screen .project-caption h3 { font-size: clamp(20px, 2.1vw, 30px); line-height: 1.2; max-width: none; }
+.device-screen .project-caption p { color: #f3f3f3; font-size: 16px; line-height: 1.45; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 3; overflow: hidden; }
+.device-screen .project-open { color: #fff; flex-shrink: 0; }
+.project-link:hover .device-screen .project-open, .project-link:focus-visible .device-screen .project-open { color: #fff; }
+.portfolio-dots { display: flex; justify-content: center; gap: 2px; flex: none; height: 24px; margin-top: -10px; }
+.portfolio-dots button { display: grid; place-items: center; width: 28px; height: 24px; border: 0; padding: 0; background: transparent; }
+.portfolio-dots span { width: 18px; height: 6px; border-radius: 4px; background: #cecdca; transition: background-color 200ms ease; }
+.portfolio-dots [aria-current="true"] span { background: var(--accent); }
+@media (max-width: 767px) {
+  .project-link { padding: 4px 0; }
+  .device-shell {
+    width: min(96%, calc((100cqh - 8px) / 2.05));
+    aspect-ratio: 1 / 2.05;
+    padding: 7px;
+    border-radius: 43px;
+    border-color: #727477;
+    box-shadow: inset 0 0 0 2px #28292b;
+  }
+  .device-shell::before, .device-shell::after { display: none; }
+  .device-screen { border-radius: 34px; }
+  .device-camera { z-index: 4; top: 16px; left: 35%; width: 30%; height: 22px; border: 0; border-radius: 20px; background: #050505; }
+  .device-status { position: absolute; inset: 0 0 auto; z-index: 3; display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 4px 20px 0; font-size: 11px; font-weight: 600; color: #111; background: #fff; }
+  .device-status > span:last-child { display: flex; align-items: center; gap: 3px; }
+  .device-screen .project-preview { top: 34px; }
+  .device-screen .project-caption { display: block; padding: 60px 17px 22px; }
+  .device-screen .project-caption h3 { font-size: clamp(18px, 5.2vw, 23px); line-height: 1.15; }
+  .device-screen .project-caption p { font-size: 14px; line-height: 1.4; margin-top: 7px; }
+  .device-screen .project-open { margin-top: 15px; font-size: 14px; }
+  .portfolio-dots { margin-top: -12px; margin-bottom: -12px; }
+}
 @media (prefers-reduced-motion: no-preference) {
   .project-link:hover .project-open svg, .project-link:focus-visible .project-open svg { transform: translate(2px, -2px); }
 }

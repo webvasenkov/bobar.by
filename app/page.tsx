@@ -31,7 +31,7 @@ export default async function Home() {
             <h1 id="hero-title">
               Строю сайты
               <br />
-              для бизнеса.
+              для бизнеса
             </h1>
             <HeroSlogans />
             <div className="hero-actions">
@@ -46,7 +46,7 @@ export default async function Home() {
           <HeroMark />
         </section>
         {portfolioUnavailable ? <section id="work" className="section container">
-          <h2>Мои работы.</h2><p className="subtitle">Не удалось загрузить работы. Попробуйте обновить страницу.</p>
+          <h2>Мои работы</h2><p className="subtitle">Не удалось загрузить работы. Попробуйте обновить страницу.</p>
         </section> : <Portfolio projects={projects} />}
         <section
           id="pricing"
@@ -54,7 +54,7 @@ export default async function Home() {
           aria-labelledby="pricing-title"
           data-reveal
         >
-          <h2 id="pricing-title">Понятная стоимость.</h2>
+          <h2 id="pricing-title">Понятная стоимость</h2>
           <div className="pricing-layout">
             <dl className="price-list">
               {[
@@ -90,7 +90,7 @@ export default async function Home() {
           <h2 id="process-title">
             От идеи
             <br />
-            до запуска.
+            до запуска
           </h2>
           <ol>
             {steps.map(([name, description], index) => {
@@ -113,7 +113,7 @@ export default async function Home() {
           <h2 id="about-title">
             Ваш сайт
             <br />
-            создаю я.
+            создаю я
           </h2>
           <div>
             <p className="about-intro">Я Денис, разработчик BOBAR.</p>
@@ -147,7 +147,7 @@ export default async function Home() {
           <h2 id="contact-title">
             Есть идея?
             <br />
-            Давайте построим.
+            Давайте построим
           </h2>
           <p className="subtitle">
             Расскажите о задаче – я предложу решение,
