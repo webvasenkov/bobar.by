@@ -6,6 +6,7 @@ import { ArrowLeft, ArrowRight, ArrowUpRight, BatteryFull, Signal, Wifi } from "
 import type { Project } from "@/lib/project-types";
 import { BrandMark } from "./brand";
 import { ProjectGallery } from "./project-gallery";
+import { DeviceTime } from "./device-time";
 
 export function Portfolio({ projects }: { projects: Project[] }) {
   const [viewportRef, api] = useEmblaCarousel({
@@ -90,7 +91,7 @@ export function Portfolio({ projects }: { projects: Project[] }) {
           <span className="device-camera" aria-hidden="true" />
           <div className="device-screen">
             <div className="device-status" aria-hidden="true">
-              <span>9:41</span><span><Signal size={13} /><Wifi size={13} /><BatteryFull size={17} /></span>
+              <DeviceTime /><span><Signal size={13} /><Wifi size={13} /><BatteryFull size={17} /></span>
             </div>
             <div className="portfolio-viewport" ref={viewportRef}>
               <div className="portfolio-track">

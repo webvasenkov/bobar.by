@@ -594,6 +594,10 @@ h3 {
   font-style: normal;
   line-height: 1.5;
 }
+.device-time {
+  min-width: 5ch;
+  font-variant-numeric: tabular-nums;
+}
 .contact-links a {
   display: inline-flex;
   align-items: center;
