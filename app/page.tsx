@@ -165,6 +165,9 @@ export default async function Home() {
           <span>bobar.by</span>
           <a href="#contact">Связаться ↑</a>
         </div>
+        <p className="footer-legal">
+          Самозанятый · <span>УНП CE5889757</span>
+        </p>
       </footer>
       <RevealEffects />
     </div>

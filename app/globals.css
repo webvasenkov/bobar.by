@@ -705,6 +705,8 @@ h3 {
 }
 .site-footer {
   display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
   justify-content: space-between;
   align-items: center;
   padding-block: 30px 45px;
@@ -714,6 +716,16 @@ h3 {
   gap: 30px;
   font-size: 14px;
   color: var(--muted);
+}
+.footer-legal {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--muted);
+}
+.footer-legal span {
+  white-space: nowrap;
 }
 .skip-link {
   position: fixed;
