@@ -718,13 +718,15 @@ h3 {
   color: var(--muted);
 }
 .footer-legal {
+  display: grid;
+  gap: 4px;
   flex-basis: 100%;
   margin: 0;
   font-size: 14px;
   line-height: 1.6;
   color: var(--muted);
 }
-.footer-legal span {
+.footer-unp {
   white-space: nowrap;
 }
 .skip-link {

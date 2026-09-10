@@ -166,7 +166,9 @@ export default async function Home() {
           <a href="#contact">Связаться ↑</a>
         </div>
         <p className="footer-legal">
-          Самозанятый · <span>УНП CE5889757</span>
+          <span>Васенков Денис Дмитриевич</span>
+          <span>Самозанятый · <span className="footer-unp">УНП CE5889757</span></span>
+          <span>Витебская обл., г. Новополоцк, ул. Молодежная, д. 186, корп. 4, кв. 46</span>
         </p>
       </footer>
       <RevealEffects />
