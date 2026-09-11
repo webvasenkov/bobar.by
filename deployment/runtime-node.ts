@@ -22,7 +22,7 @@ function getConnection() {
     connection.exec("PRAGMA journal_mode=WAL; PRAGMA busy_timeout=5000; PRAGMA foreign_keys=ON;");
     connection.exec("BEGIN IMMEDIATE");
     const version = Number(connection.prepare("PRAGMA user_version").get()?.user_version);
-    const migrations = ["0000_skinny_sersi.sql", "0001_cynical_black_cat.sql", "0002_big_adam_destine.sql"];
+    const migrations = ["0000_skinny_sersi.sql", "0001_cynical_black_cat.sql", "0002_big_adam_destine.sql", "0003_image_optimization.sql"];
     if (version > migrations.length) throw new Error("Unsupported database schema version");
     for (let index = version; index < migrations.length; index++) {
       connection.exec(readFileSync(resolve("drizzle", migrations[index]), "utf8"));
