@@ -28,7 +28,21 @@ async function seedProjects() {
 export async function listProjects(includeHidden = false): Promise<Project[]> {
   await seedProjects();
   const rows = await getDatabase().prepare(`SELECT * FROM portfolio_projects ${includeHidden ? "" : "WHERE published = 1"} ORDER BY position, id`).all<ProjectRow>();
-  return rows.results.map(convert);
+  const projects = rows.results.map(convert);
+  const ids = [...new Set(projects.flatMap(project => [...project.desktopImages, ...project.mobileImages])
+    .filter(path => path.startsWith("/media/")).map(path => path.slice(7)))];
+  const placeholders: Record<string, string> = {};
+  // Query only images referenced by this response, including hidden projects only for admins.
+  for (let offset = 0; offset < ids.length; offset += 80) {
+    const batch = ids.slice(offset, offset + 80);
+    const result = await getDatabase().prepare(`SELECT id, blur_data_url FROM portfolio_images WHERE id IN (${batch.map(() => "?").join(",")}) AND blur_data_url IS NOT NULL`)
+      .bind(...batch).all<{ id: string; blur_data_url: string }>();
+    for (const image of result.results) placeholders[`/media/${image.id}`] = image.blur_data_url;
+  }
+  return projects.map(project => ({ ...project, imagePlaceholders: Object.fromEntries(
+    [...new Set([...project.desktopImages, ...project.mobileImages])]
+      .filter(path => placeholders[path]).map(path => [path, placeholders[path]]),
+  ) }));
 }
 
 const imagePath = z.string().max(200).refine(value => value === "" || /^\/media\/[0-9a-f-]{36}$/.test(value) || originals.some(project => project.image === value));

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { type CSSProperties, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "gsap";
 import type { Project } from "@/lib/project-types";
 
@@ -69,14 +69,34 @@ export function ProjectGallery({ project, active }: { project: Project; active: 
     };
   }, [playing, index, next, mobile]);
 
-  const picture = (position: number, overlay = false) => (
-    <picture ref={overlay ? incoming : undefined} style={overlay ? { opacity: 0 } : undefined} aria-hidden={overlay || undefined}>
-      {phone.length > 0 && <source media="(max-width: 767px)" srcSet={phone[position % phone.length]} />}
-      <img src={desktop[position % Math.max(1, desktop.length)] || project.desktopImage}
+  const picture = (position: number, overlay = false) => {
+    const desktopSrc = desktop[position % Math.max(1, desktop.length)] || project.desktopImage;
+    const mobileSrc = phone[position % Math.max(1, phone.length)] || desktopSrc;
+    const desktopBlur = project.imagePlaceholders?.[desktopSrc];
+    const mobileBlur = project.imagePlaceholders?.[mobileSrc];
+    const style = {
+      ...(overlay ? { opacity: 0 } : {}),
+      "--desktop-blur": desktopBlur ? `url("${desktopBlur}")` : "none",
+      "--mobile-blur": mobileBlur ? `url("${mobileBlur}")` : "none",
+    } as CSSProperties;
+    return <picture key={`${overlay}:${desktopSrc}:${mobileSrc}`} ref={overlay ? incoming : undefined}
+      style={style} className="screenshot-picture" aria-hidden={overlay || undefined}>
+      <source media="(max-width: 767px)" srcSet={mobileSrc} />
+      <img src={desktopSrc}
         alt={overlay ? "" : `Главная страница сайта «${project.name}»`}
-        draggable={false} loading={overlay ? "eager" : "lazy"} decoding="async" />
-    </picture>
-  );
+        draggable={false} loading={overlay ? "eager" : "lazy"} decoding="async"
+        onLoad={event => {
+          const image = event.currentTarget;
+          const source = image.currentSrc;
+          // The native image stays visible without JavaScript too. Clear the background
+          // only after decoding, including transparent images, without affecting the GSAP layer.
+          void image.decode().then(() => {
+            if (image.currentSrc === source && image.parentElement)
+              image.parentElement.style.backgroundImage = "none";
+          }).catch(() => {});
+        }} />
+    </picture>;
+  };
 
   return <div className="project-preview" ref={root}>
     {picture(index)}

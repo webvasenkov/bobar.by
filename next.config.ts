@@ -9,6 +9,10 @@ const nextConfig: NextConfig = {
       /^@\/lib\/runtime$/,
       resolve("deployment/runtime-node.ts"),
     ));
+    config.plugins.push(new webpack.NormalModuleReplacementPlugin(
+      /^@\/lib\/image-optimizer$/,
+      resolve("deployment/image-optimizer.mjs"),
+    ));
     return config;
   },
 };

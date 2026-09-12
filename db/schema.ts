@@ -43,6 +43,9 @@ export const portfolioImages = sqliteTable("portfolio_images", {
   width: integer("width").notNull(),
   height: integer("height").notNull(),
   createdAt: integer("created_at").notNull(),
+  storageKey: text("storage_key"),
+  blurDataURL: text("blur_data_url"),
+  optimizationVersion: integer("optimization_version").notNull().default(0),
 });
 
 export const adminSessions = sqliteTable("admin_sessions", {

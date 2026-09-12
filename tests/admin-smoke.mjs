@@ -6,6 +6,7 @@ import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { DatabaseSync } from "node:sqlite";
 import { setTimeout as delay } from "node:timers/promises";
+import sharp from "sharp";
 
 // Real HTTP against the production server, with temporary data and no notifications.
 const root = resolve(".next/standalone");
@@ -77,9 +78,23 @@ try {
   assert.equal((await upload(Buffer.from('<svg width="10" height="10" xmlns="http://www.w3.org/2000/svg"></svg>'))).status, 415);
   assert.equal((await upload(Buffer.alloc(8 * 1024 * 1024 + 1))).status, 413);
   const bytes = await readFile("public/projects/flowers.png");
+  const png = await sharp(bytes).png({ compressionLevel: 0 }).toBuffer();
+  const compressedResponse = await upload(png);
+  assert.equal(compressedResponse.status, 201);
+  const compressed = await compressedResponse.json();
+  assert.ok(compressed.optimizedBytes < compressed.originalBytes);
+  const compressedMedia = await request(compressed.path);
+  assert.equal(compressedMedia.headers.get("content-type"), "image/webp");
+  assert.deepEqual(await sharp(Buffer.from(await compressedMedia.arrayBuffer())).ensureAlpha().raw().toBuffer(),
+    await sharp(png).ensureAlpha().raw().toBuffer());
+  assert.deepEqual(await readFile(join(temp, "uploads", compressed.path.slice(7))), png, "Uploaded original is retained");
   const screens = [];
   for (let i = 0; i < 4; i++) {
-    const response = await upload(bytes); assert.equal(response.status, 201); screens.push((await response.json()).path);
+    const response = await upload(bytes); assert.equal(response.status, 201);
+    const image = await response.json();
+    assert.ok(image.optimizedBytes <= image.originalBytes);
+    assert.match(image.blurDataURL, /^data:image\/webp;base64,/);
+    screens.push(image.path);
   }
   assert.equal((await fetch(base + screens[0])).status, 404, "Unpublished uploads stay private");
   assert.equal((await request(screens[0])).status, 200);
@@ -101,6 +116,13 @@ try {
   assert.deepEqual(project.desktopImages, [screens[0], screens[2]]);
   assert.deepEqual(project.mobileImages, [screens[1], screens[3]]);
   assert.equal((await fetch(base + screens[2])).status, 200, "Additional gallery screenshots are public");
+  assert.match(project.imagePlaceholders[screens[2]], /^data:image\/webp;base64,/);
+  const media = await fetch(base + screens[2]);
+  const etag = media.headers.get("etag");
+  assert.ok(etag);
+  assert.equal(media.headers.get("cache-control"), "private, no-cache");
+  assert.equal((await fetch(base + screens[2], { headers: { "If-None-Match": etag } })).status, 304);
+  assert.match(await (await fetch(base)).text(), /--desktop-blur/);
   assert.equal((await request("/api/admin/projects", "PUT", { ...project, desktopImages: Array(9).fill(screens[0]) })).status, 400);
   assert.equal((await request("/api/admin/projects", "PUT", { ...project, mobileImages: [] })).status, 400, "Published work must retain a mobile screenshot");
   assert.equal((await request("/api/admin/projects", "PUT", { ...project, desktopImages: [screens[2]], mobileImages: [screens[1]] })).status, 200);
@@ -122,11 +144,13 @@ try {
   assert.equal((await fetch(base + screens[0])).status, 200, "Uploads survive restart");
   assert.equal((await request("/api/admin/projects", "PATCH", { id: project.id, version: project.version, published: false })).status, 200);
   assert.equal((await fetch(base + screens[0])).status, 404, "Hidden screenshot no longer public");
+  assert.equal((await fetch(base + screens[2], { headers: { "If-None-Match": etag } })).status, 404,
+    "A cached screenshot cannot bypass unpublishing");
   assert.equal((await request("/api/admin/session", "DELETE")).status, 200);
   assert.equal((await request("/api/admin/projects")).status, 401, "Logout invalidates session on server");
   await login();
   const db = new DatabaseSync(databasePath);
-  assert.equal(db.prepare("PRAGMA user_version").get().user_version, 3);
+  assert.equal(db.prepare("PRAGMA user_version").get().user_version, 4);
   assert.equal(db.prepare("SELECT name FROM inquiries WHERE id = 'legacy-inquiry'").get().name, "Тест");
   db.prepare("UPDATE admin_sessions SET expires_at = 1").run();
   assert.equal((await request("/api/admin/session")).status, 401, "Expired sessions rejected");
